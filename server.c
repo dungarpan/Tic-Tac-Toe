@@ -3,6 +3,9 @@
 #include<string.h>
 #include<netdb.h>
 #include<stdlib.h>
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
+
 int main(int argc, char* argv[])
 {
 	if(argc!=2){
@@ -11,9 +14,24 @@ int main(int argc, char* argv[])
     char buf[100];
     pid_t pid;
     int k;
+    int *board;
     socklen_t len;
     int sock_desc,temp_sock_desc;
     struct sockaddr_in server,client;
+
+    key_t key = ftok(".",'a');
+    int shmid = shmget(key, 9 * sizeof(int), IPC_CREAT | 0666);
+    if(shmid<0){
+    	printf("cannot create shared memory\n");
+    }
+    board = shmat(shmid, 0, 0);
+
+    for(int i=0;i<3;i++){
+    	for(int j=0;j<3;j++){
+        	board[3*i + j] = 0;
+    	}
+    }
+
 
     memset(&server,0,sizeof(server));
     memset(&client,0,sizeof(client));
@@ -56,6 +74,9 @@ int main(int argc, char* argv[])
 	    while(1)
 	    {
 	    	printf("Player 1's turn\n");
+	    	for(int i=0;i<9;i++){
+	    		printf("%d ",board[i]);
+	    	}
 	        k=recv(temp_sock_desc,buf,100,0);
 	        if(k==-1)
 	        {
@@ -79,7 +100,7 @@ int main(int argc, char* argv[])
 	    }
 	    close(temp_sock_desc);
 	}
-	
+
 	else{
 	    len=sizeof(client);//VERY IMPORTANT
 	    temp_sock_desc=accept(sock_desc,(struct sockaddr*)&client,&len);

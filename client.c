@@ -3,17 +3,29 @@
 #include<string.h>
 #include<netdb.h>
 #include<stdlib.h>
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
 
 int main(int argc, char* argv[])
 {
     if(argc!=2){
         printf("1 arguement is required");
     }
+
     char buf[100];
     int k;
+    int *board;
     int sock_desc;
     struct sockaddr_in client;
     memset(&client,0,sizeof(client));
+    
+    key_t key = ftok("key_board",65);
+    int shmid = shmget(key, 9 * sizeof(int), 0666|IPC_CREAT);
+    board = shmat(shmid, 0, 0);
+
+    for(int i=0;i<9;i++){
+
+    }
     sock_desc=socket(AF_INET,SOCK_STREAM,0);
 
     if(sock_desc==-1)
