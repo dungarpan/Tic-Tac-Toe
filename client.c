@@ -13,19 +13,20 @@ int main(int argc, char* argv[])
     }
 
     char buf[100];
-    int k;
+    int k,move;
     int *board;
     int sock_desc;
     struct sockaddr_in client;
     memset(&client,0,sizeof(client));
     
-    key_t key = ftok("key_board",65);
-    int shmid = shmget(key, 9 * sizeof(int), 0666|IPC_CREAT);
+    key_t key = ftok(".",'a');
+    int shmid = shmget(key, 9 * sizeof(int), 0666);
+    if(shmid<0){
+        printf("cannot create shared memory\n");
+    }
+
     board = shmat(shmid, 0, 0);
 
-    for(int i=0;i<9;i++){
-
-    }
     sock_desc=socket(AF_INET,SOCK_STREAM,0);
 
     if(sock_desc==-1)
@@ -47,7 +48,15 @@ int main(int argc, char* argv[])
 
     while(1)
     {
-        printf("\nEnter data to be send to server: ");
+
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                printf("%d "board[3*i+j]);
+            }
+            printf("\n");
+        }
+
+        printf("\nEnter your move(0-8):\nEnter end to quit\n");
         fgets(buf,100,stdin);
         if(strncmp(buf,"end",3)==0)
             break;
@@ -66,7 +75,15 @@ int main(int argc, char* argv[])
             exit(1);
         }
 
-        printf("Message got from server is : %s",buf);
+        printf("Your move has been recorded in: %s",buf);
+
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                printf("%d "board[3*i+j]);
+            }
+            printf("\n");
+        }
+
     }
     close(sock_desc);
     exit(0);

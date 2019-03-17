@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
     if(shmid<0){
     	printf("cannot create shared memory\n");
     }
+
     board = shmat(shmid, 0, 0);
 
     for(int i=0;i<3;i++){
@@ -74,9 +75,14 @@ int main(int argc, char* argv[])
 	    while(1)
 	    {
 	    	printf("Player 1's turn\n");
-	    	for(int i=0;i<9;i++){
-	    		printf("%d ",board[i]);
-	    	}
+
+	        for(int i=0;i<3;i++){
+	            for(int j=0;j<3;j++){
+	                printf("%d "board[3*i+j]);
+	            }
+	            printf("\n");
+	        }
+
 	        k=recv(temp_sock_desc,buf,100,0);
 	        if(k==-1)
 	        {
@@ -84,18 +90,22 @@ int main(int argc, char* argv[])
 	            exit(1);
 	        }
 
-	        printf("Message got from player 1 is : %s",buf);
-	        printf("\nEnter data to be sent to client: ");
-
-	        fgets(buf,100,stdin);
-	        if(strncmp(buf,"end",3)==0)
-	            break;
+	        printf("Player 1 has given his move in : %s",buf);
+	        int move = atoi(buf);
+	        board[move] = 1;
 
 	        k=send(temp_sock_desc,buf,100,0);
 	        if(k==-1)
 	        {
 	            printf("Error in sending");
 	            exit(1);
+	        }
+
+	        for(int i=0;i<3;i++){
+	            for(int j=0;j<3;j++){
+	                printf("%d "board[3*i+j]);
+	            }
+	            printf("\n");
 	        }
 	    }
 	    close(temp_sock_desc);
@@ -113,6 +123,14 @@ int main(int argc, char* argv[])
 	    while(1)
 	    {
 	    	printf("Player 2's turn\n");
+
+	        for(int i=0;i<3;i++){
+	            for(int j=0;j<3;j++){
+	                printf("%d "board[3*i+j]);
+	            }
+	            printf("\n");
+	        }
+
 	        k=recv(temp_sock_desc,buf,100,0);
 	        if(k==-1)
 	        {
@@ -120,18 +138,22 @@ int main(int argc, char* argv[])
 	            exit(1);
 	        }
 
-	        printf("Message got from player 2 is : %s",buf);
-	        printf("\nEnter data to be sent to client: ");
-
-	        fgets(buf,100,stdin);
-	        if(strncmp(buf,"end",3)==0)
-	            break;
+	        printf("Player 1 has given his move in : %s",buf);
+	        int move = atoi(buf);
+	        board[move] = 2;
 
 	        k=send(temp_sock_desc,buf,100,0);
 	        if(k==-1)
 	        {
 	            printf("Error in sending");
 	            exit(1);
+	        }
+
+	        for(int i=0;i<3;i++){
+	            for(int j=0;j<3;j++){
+	                printf("%d "board[3*i+j]);
+	            }
+	            printf("\n");
 	        }
 	    }
 	    close(temp_sock_desc);
